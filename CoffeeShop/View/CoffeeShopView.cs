@@ -159,7 +159,17 @@ namespace CoffeeShop.View
 
         public void ViewOrders()
         {
-
+            List<Order> orders = this._coffeeShopManager.GetOrdersByID(CurrentUserLoggedIn.UserID);
+            ConsoleTable ordersTable = new ConsoleTable();
+            ordersTable.AddColumn(new string[]
+            {
+                nameof(Order.Quantity), nameof(Order.Beverage), nameof(Order.OrderStatus)
+            });
+            foreach (Order order in orders)
+            {
+                ordersTable.AddRow(order.Quantity, order.Beverage, order.OrderStatus);
+            }
+            ordersTable.Write();
         }
 
         public void CancelOrder()

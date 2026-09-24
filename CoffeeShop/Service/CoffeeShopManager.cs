@@ -97,6 +97,28 @@ public class CoffeeShopManager
         return operationResult;
     }
 
+
+    public async Task ProcessPendingOrders()
+    {
+        while (_ordersToBeProcessed.Count > 0)
+        {
+            CoffeeMachine? machine = GetAvailableMachine();
+            if (machine is null)
+            {
+                await Task.Delay(500);
+                continue;
+            }
+
+            Order order = _ordersToBeProcessed.Dequeue();
+            CoffeeMachineWork worker = new CoffeeMachineWork(machine);
+
+            _ = worker.ProcessOrder(order);
+        }
+    }
+    private CoffeeMachine? GetAvailableMachine() => _coffeeMachines
+            .FirstOrDefault(x =>
+                x.MachineStatus == MachineStatus.Available);
+
     public List<Order> GetOrdersByID(Guid customerID) => this._orderRepository.GetOrders().Where(order => order.CustomerID.Equals(customerID)).ToList();
 
     public bool CheckStock(Beverage beverage, int quantity, out int minutesNeeded)
